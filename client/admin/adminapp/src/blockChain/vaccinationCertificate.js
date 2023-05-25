@@ -271,7 +271,7 @@ const wrappedTokenWithdraw = async ({ address, web3, values }) => {
     });
 
   const decodedData = await decodedDataFunction();
-  //   console.log('decodedData', decodedData);
+  console.log('decodedData', decodedData);
 
   if (result) {
     return { ...decodedData, transactionHash: result.transactionHash };

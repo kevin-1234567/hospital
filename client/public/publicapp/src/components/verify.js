@@ -7,6 +7,8 @@ import certificateVerificationFunction from '../blockchain/vaccinationCertificat
 const Certificate = () => {
   const [certificateNumber, setCertificateNumber] = useState('');
   const [vaccineCert, setVaccineCert] = useState('');
+  const [vaccinedecodedvalues, setVaccinedecodedvalues] = useState('');
+  const [consuldecodedvalues, setConsuldecodedvalues] = useState('');
 
   // verify consultation certificate
   const verifyConsultation = async (e) => {
@@ -20,6 +22,30 @@ const Certificate = () => {
       certificateNumber,
     });
     console.log(verconsul);
+    const startTimestamp = verconsul.issuedDateTime; // Example start timestamp
+    const endTimestamp = verconsul.consultationTime; // Example end timestamp
+
+    const startDate = new Date(startTimestamp * 1000);
+    const endDate = new Date(endTimestamp * 1000);
+    const startHours = startDate.getHours();
+    const endHours = endDate.getHours();
+
+    const startAMPM = startHours >= 12 ? 'PM' : 'AM';
+    const endAMPM = endHours >= 12 ? 'PM' : 'AM';
+    const returnedconsul = {
+      certificateNumber: verconsul.certificateNumber,
+      patientName: web3.utils.hexToUtf8(verconsul.patientName),
+      patientUUID: web3.utils.hexToUtf8(verconsul.patientUUID),
+      patientRegId: verconsul.patientRegId,
+      doctorName: web3.utils.hexToUtf8(verconsul.doctorName),
+      consultationTime: endHours + ':00' + endAMPM,
+      departmentName: web3.utils.hexToUtf8(verconsul.departmentName),
+      hospitalName: web3.utils.hexToUtf8(verconsul.hospitalName) + 'Hospitals',
+      issuerName: web3.utils.hexToUtf8(verconsul.issuerName),
+      issuerId: web3.utils.hexToUtf8(verconsul.issuerId),
+      issuedDateTime: startHours + ':00' + startAMPM,
+    };
+    console.log('decoded consultation', setConsuldecodedvalues(returnedconsul));
   };
   // verify vaccineation certificate
 
@@ -39,29 +65,24 @@ const Certificate = () => {
       certificateNumber: vaccineCert,
     });
     console.log(vervacc);
-    const startTimestamp = vervacc.issuedDateTime; // Example start timestamp
-    const endTimestamp = vervacc.vaccineTakenDatetime;
-    const startDate = new Date(startTimestamp * 1000);
-    const endDate = new Date(endTimestamp * 1000);
-    const startHours = startDate.getHours();
-    const endHours = endDate.getHours();
 
-    const startAMPM = startHours >= 12 ? 'PM' : 'AM';
-    const endAMPM = endHours >= 12 ? 'PM' : 'AM';
     const returnedCertificates = {
-      certificateNumber: vervacc.certificateNumber,
+      vaccineName: web3.utils.hexToUtf8(vervacc.vaccineName),
+      vaccineTakenDatetime: vervacc.issuedDateTime,
       patientName: web3.utils.hexToUtf8(vervacc.patientName),
+      certificateNumber: vervacc.certificateNumber,
       patientUUID: web3.utils.hexToUtf8(vervacc.patientUUID),
       patientRegId: vervacc.patientRegId,
-      vaccineName: web3.utils.hexToUtf8(vervacc.vaccineName),
-      vaccineTakenDatetime: endHours + ':00' + endAMPM,
       disease: web3.utils.hexToUtf8(vervacc.disease),
       antigen: web3.utils.hexToUtf8(vervacc.antigen),
-      issuerName: web3.utils.hexToUtf8(vervacc.issuerName) + 'Hospitals',
+      issuerName: web3.utils.hexToUtf8(vervacc.issuerName),
       issuerId: web3.utils.hexToUtf8(vervacc.issuerId),
-      issuedDateTime: startHours + ':00' + startAMPM,
+      issuedDateTime: vervacc.issuedDateTime,
     };
-    console.log('decoded vaccine', returnedCertificates);
+    console.log(
+      'decoded vaccine',
+      setVaccinedecodedvalues(returnedCertificates)
+    );
   };
 
   const handleVaccinationChange = (e) => {
@@ -132,6 +153,22 @@ const Certificate = () => {
           <button type="submit">Search</button>
         </form>
       </div>
+      {vaccinedecodedvalues && (
+        <div class="card">
+          <h3>{vaccinedecodedvalues.patientName}</h3>
+          <h3>{vaccinedecodedvalues.antigen}</h3>
+          <h3>{vaccinedecodedvalues.issuerName}</h3>
+          <h3>{vaccinedecodedvalues.vaccineName}</h3>
+        </div>
+      )}
+      {consuldecodedvalues && (
+        <div class="card">
+          <h3>{consuldecodedvalues.patientName}</h3>
+          <h3>{consuldecodedvalues.hospitalName}</h3>
+          <h3>{consuldecodedvalues.doctorName}</h3>
+          <h3>{consuldecodedvalues.departmentName}</h3>
+        </div>
+      )}
     </div>
   );
 };
